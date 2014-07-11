@@ -9,10 +9,7 @@ EXES := $(SRCS:%.rs=bin/%)
 all: $(EXES)
 
 clean:
-	$(RM) -r bin/
+	$(RM) -r $(EXES:%=%*)
 
-bin/%: %.rs bin
+bin/%: %.rs
 	$(RUSTC) $(RUSTFLAGS) -o $@ $<
-
-bin:
-	mkdir -p bin
