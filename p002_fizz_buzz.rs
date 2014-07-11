@@ -13,16 +13,12 @@ fn to_fizz_buzz(i: int) -> (int, &str) {
 }
 
 fn print_elem((i, x): (int, &str)) {
-    let istr = i.to_str();
+    let istr = i.to_string();
     std::io::stdio::println(if x == "" { istr.as_slice() } else { x });
 }
 
 fn fizz_buzz(n: int, m: int) {
-    // It can be compiled, but none was printed !!
-    // range(n, m).map(to_fizz_buzz).map(print_elem);
-    for ix in range(n, m).map(to_fizz_buzz) {
-        print_elem(ix);
-    }
+    range(n, m).map(to_fizz_buzz).map(print_elem).count();
 }
 
 fn main() {
