@@ -1,3 +1,7 @@
+// Copyright (c) 2014 liquid_amber
+// This file is distributed under MIT license.
+// See LICENSE file.
+
 enum SimpleList<T> {
     Cons(T, Box<SimpleList<T>>),
     Nil,
