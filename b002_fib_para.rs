@@ -3,32 +3,27 @@
 // See LICENSE file.
 
 extern crate green;
-
-#[start]
-fn start(argc: int, argv: *const *const u8) -> int {
-    green::start(argc, argv, green::basic::event_loop, main)
-}
+extern crate rustuv;
 
 fn fibonacci(n: int) -> int {
     if n < 2 {
-        return n;
+        n
+    } else {
+        let mut n1 = std::sync::Future::spawn(
+            proc () fibonacci(n - 1));
+        let mut n2 = std::sync::Future::spawn(
+            proc () fibonacci(n - 2));
+        n1.get() + n2.get()
     }
-    let (sink_, source) = channel();
-    {
-        let sink = sink_.clone();
-        spawn(proc() {
-            sink.send(fibonacci(n - 2))
-        });
-    }
-    {
-        let sink = sink_.clone();
-        spawn(proc() {
-            sink.send(fibonacci(n - 1))
-        });
-    }
-    source.recv() + source.recv()
+}
+
+#[start]
+fn start(argc: int, argv: *const *const u8) -> int {
+    // I don't know the reason, however, green::basic::event_loop cause error.
+    // task '<main>' failed at 'called `Result::unwrap()` on an `Err` value: invalid argument', /home/rustbuild/src/rust-buildbot/slave/nightly-linux/build/src/libcore/result.rs:545
+    green::start(argc, argv, rustuv::event_loop, main)
 }
 
 fn main() {
-    println!("{}", fibonacci(10));
+    println!("{}", fibonacci(40));
 }
