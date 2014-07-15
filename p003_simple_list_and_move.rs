@@ -16,7 +16,7 @@ fn length<T>(xs: &SimpleList<T>) -> int {
 
 fn main() {
     let mut xs = box Nil;
-    xs = box Cons(3, xs);
+    xs = box Cons(3i, xs);
     xs = box Cons(2, xs);
     xs = box Cons(1, xs);
     let ys = xs;
