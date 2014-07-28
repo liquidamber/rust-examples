@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>10分でわかるRust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif', sans-serif; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono', monospace; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# 10分でわかるRust
+
+---
+
+# Agenda
+
+1. Rustについて
+2. Cっぽさ
+3. Haskellっぽさ
+4. キモい部分
+
+---
+
+# Rustって何？
+
+> Rust is a systems programming language
+> that runs blazingly fast, prevent almost
+> all crashes[theoretical], and eliminates
+> data races.
+http://www.rust-lang.org/
+
+* システムレベルのプログラミングで
+  - スタック, ヒープを区別したメモリ確保
+  - メモリアドレスの操作
+  - 小さいランタイム(嘘)
+* 高水準な言語仕様と
+  - 代数的データ構造/パターンマッチ
+  - クロージャ, メモリ安全性(*)
+* 高性能を両立させる言語
+  - Actorモデル, タスク並列
+  - ネイティブコード生成
+
+---
+
+インストール&amp;使い方
+-----------------------
+* Linux, Mac, Windows用バイナリ
+* ソースコンパイル
+  - bootstrap用rustcが必要
+* Web上のデモ
+  - http://play.rust-lang.org/
+
+```bash
+cat > hello.rs <<EOT
+fn main() {
+    println!("Hello, world!");
+}
+EOT
+rustc hello.rs
+./hello
+```
+* rustcでコンパイルして実行
+  - replは現時点で未実装
+  - ライブラリを作る方法はある(crate)
+* エディタサポートは充実
+  - Emacs, Sublime Text 2, Vim
+
+---
+
+class: center
+
+# Cっぽい言語としてのRust
+
+* ### 構文
+* ### メモリ周り(あとで)
+
+---
+
+# 構文
+
+```rust
+fn main() {
+    loop { // 無限ループ用構文
+        if true || false { // ()不要, {}強制
+            while false {
+                println!("Hello, world!");
+            }
+        }
+    }
+}
+```
+
+* Cっぽい
+  - ifとかwhileの`()`は不要
+  - `{}`は強制
+
+---
+
+if文ではなくif式
+----------------
+Cっぽい書き方
+
+```rust
+let price: f64;
+if item == "salad" {
+    price = 3.50;
+} else if item == "muffin" {
+    price = 2.25;
+} else {
+    price = 2.00;
+}
+```
+
+Rustっぽい書き方
+
+```rust
+let price: f64 =
+    if item == "salad" {
+        3.50
+    } else if item == "muffin" {
+        2.25
+    } else {
+        2.00
+    };
+```
+
+---
+
+;で式の意味が変わる
+-------------------
+
+* C/C++では文を区切る記号`;`
+* Rustでは少し違う
+  - unit型`()`の導出
+  - 式の結果を捨てる
+  - `{}`の中にしか書けない?
+
+```rust
+let x: int =
+    if true {
+        1
+    } else {
+        2
+    };
+let y: () =
+    if true {
+        1;
+    } else {
+        2;
+    };
+```
+
+---
+
+プリミティブ
+------------
+* 整数と浮動小数点数
+  - `int`, `uint`, `i64`, `u8`, `f32`, `f64`, …
+  - 暗黙のキャストはない
+* 真偽値 `bool`
+* `char`は4バイトのUnicodeのコードポイント
+  - `'x'` 文字リテラル
+  - `"foobar"` 文字列リテラル
+  - `r##"raw\s+string\s+literal"##` raw文字列リテラル
+  - 文字列の型は妙に凝ってるので後で
+
+---
+
+普通の構造体
+------------
+
+```rust
+struct Point { x: f64, y: f64 } // 普通の"構造体"
+let p1 = Point { x: 1.0, y: 1.0 };
+let mut p2 = Point { x: 2.0, y: 2.0 };
+p2.x = -2.0;
+```
+
+配置はC言語の構造体と同じ
+
+---
+
+class: center
+
+# Haskellっぽい言語としてのRust
+
+* ### 代数的データ構造
+* ### パターンマッチ
+
+Higher-kind typesがないのでモナドは作れない...
+
+---
+
+# 代数的データ構造
+
+```rust
+enum Dir { Left, Right }; // 簡単なenum
+
+enum Colour {
+    Red = 0xf00,
+    Green = 0x0f0,
+    Blue = 0x00f,
+}; // 値を指定できる
+let x = Green as int; // intへキャストできる
+
+enum Shape {
+    Circle(Point, f64),
+    Rectangle(Point, Point)
+}
+
+#![feature(struct_variant)]
+enum LabeledShape {
+    LCircle { center: Point, radius: f64 },
+    RRectangle { top_left: Point, bottom_right: Point }
+}
+```
+
+* Haskellのdataでできることはだいたいできる
+
+---
+
+# パターンマッチ
+
+代数的データ構造といえばパターンマッチ
+
+```rust
+fn lr_to_int(dir: Dir) -> int {
+    match dir {
+        Left => -1,
+        Right => 1
+    }
+}
+
+fn get_size(s: Shape) -> f64 {
+    match s {
+        Circle(_, radius) =>
+            std::num::powif64(radius, 2) * std::f64::consts::PI,
+        Rectangle(p1, p2) =>
+            std::num::abs(p1.x - p2.x) * std::num::abs(p1.y - p2.y)
+    }
+}
+```
+
+---
+
+8 所有権
+--------
+
+Rustでは、オブジェクトの寿命は変数の寿命と一致するか、或いはtask-localなGCに委ねられます。[C/C++では変数の寿命と一致する変数のほかはヒープを使って頑張るしかなかったことを考えると、GCがあるのは素晴らしい気がする。]オブジェクトのowner（所有者）は自分の責任で寿命を管理する必要があります。あと、変数がmutableかどうかもownerが決めます。
+
+オブジェクトの所有権は再帰的です。例えば、struct自体のmutabilityと各要素のmutabilityは一致するし、structの寿命が尽きるときには各要素の寿命も尽きるということです。変数はトップレベルの所有者なので、スコープから脱出するときに各要素も削除されます。[C++でデストラクタがスコープ抜けるときに呼ばれるのと同じ。]
+
+```rust
+// structは`x`,`y`を所有している。
+struct Foo { x: int, y: Box<int> }
+
+{
+    // `a`はstructのownerなので其のフィールド自体も所有している
+    let a = Foo { x: 5, y: box 10 };
+}
+// ここにくると`a`がスコープから抜けるので`Box<int>`のデストラクタが走って
+// 割り当てられたメモリも開放される。
+
+// `b`はmutableなので各要素もmutableになる。
+let mut b = Foo { x: 5, y: box 10 };
+b.x = 10;
+```
+
+オブジェクトが`Send`な`trait`の型だけで構成されている時[`Send`ってなんやねん]、オブジェクトは単一のownership treeからなり[これもわからないがオブジェクトが共有されていないということだろう]、そのオブジェクト自体も`Send` traitを満たす型になりタスク間で転送することができます。[タスク間でデータを転送する際は共有されているデータを使うとraceして大変なことになるのでそれを避けるためだろう。]さらに、自分でデストラクタを定義できるのも`Send` traitを満たす型だけです。ただ`Send`を満たさない型でもcustom destructor （独自定義したデストラクタ）を持つ型を含むことはできます。`Send`ではない型の例は[C++で考えればわかるけど]
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
