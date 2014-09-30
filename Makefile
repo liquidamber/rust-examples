@@ -11,6 +11,8 @@ CILK_LIBS ?= -lcilkrts
 GHC ?= ghc
 GHCFLAGS ?= -O3 -Wall
 
+GO ?= go
+
 SRCS_RS := $(wildcard *.rs)
 EXES_RS := $(SRCS_RS:%.rs=bin/%_rs)
 
@@ -20,10 +22,13 @@ EXES_CC := $(SRCS_CC:%.cc=bin/%_cc)
 SRCS_CILK := $(wildcard *.cilk.cc)
 EXES_CILK := $(SRCS_CILK:%.cilk.cc=bin/%_cilk)
 
+SRCS_GO := $(wildcard *.go)
+EXES_GO := $(SRCS_GO:%.go=bin/%_go)
+
 SRCS_HS := $(wildcard *.hs)
 EXES_HS := $(SRCS_HS:%.hs=bin/%_hs)
 
-EXES := $(EXES_RS) $(EXES_CC) $(EXES_CILK) $(EXES_HS)
+EXES := $(EXES_RS) $(EXES_CC) $(EXES_CILK) $(EXES_GO) $(EXES_HS)
 
 .PHONY: all clean
 
@@ -40,6 +45,9 @@ bin/%_cc: %.cc
 
 bin/%_cilk: %.cilk.cc
 	$(CILK_CXX) $(CXXFLAGS) $(CILK_FLAGS) -o $@ $< $(LDFLAGS) $(LIBS) $(CILK_LIBS)
+
+bin/%_go: %.go
+	$(GO) build -o $@ $<
 
 bin/%_hs: %.hs
 	$(GHC) $(GHCFLAGS) -o $@ $< -outputdir=$@.tmp
