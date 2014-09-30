@@ -2,7 +2,7 @@
 // This file is distributed under MIT license.
 // See LICENSE file.
 
-fn to_fizz_buzz(i: int) -> (int, &str) {
+fn to_fizz_buzz(i: int) -> (int, &'static str) {
     let message = match i {
         _ if i % 15 == 0 => "FizzBuzz",
         _ if i % 3 == 0 => "Fizz",
