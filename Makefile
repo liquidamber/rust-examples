@@ -28,7 +28,33 @@ EXES_GO := $(SRCS_GO:%.go=bin/%_go)
 SRCS_HS := $(wildcard *.hs)
 EXES_HS := $(SRCS_HS:%.hs=bin/%_hs)
 
-EXES := $(EXES_RS) $(EXES_CC) $(EXES_CILK) $(EXES_GO) $(EXES_HS)
+EXES :=
+
+ENABLE_RUST ?= 1
+ENABLE_CC ?= 1
+ENABLE_CILK ?= 1
+ENABLE_GO ?= 1
+ENABLE_HS ?= 1
+
+ifeq ($(ENABLE_RUST),1)
+EXES += $(EXES_RS)
+endif
+
+ifeq ($(ENABLE_CC),1)
+EXES += $(EXES_CC)
+endif
+
+ifeq ($(ENABLE_CILK),1)
+EXES += $(EXES_CILK)
+endif
+
+ifeq ($(ENABLE_GO),1)
+EXES += $(EXES_GO)
+endif
+
+ifeq ($(ENABLE_HS),1)
+EXES += $(EXES_HS)
+endif
 
 .PHONY: all clean
 
