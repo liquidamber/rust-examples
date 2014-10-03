@@ -9,7 +9,7 @@ enum SimpleList<T> {
 
 fn length<T>(xs: &SimpleList<T>) -> int {
     match xs {
-        &Cons(_, ref ys) => 1 + length(*ys),
+        &Cons(_, box ref ys) => 1 + length(ys),
         &Nil => 0,
     }
 }
@@ -20,7 +20,7 @@ fn main() {
     xs = box Cons(2, xs);
     xs = box Cons(1, xs);
     let ys = xs;
-    println!("{}", length(ys)); // OK
+    println!("{}", length(&*ys)); // OK
     // xs is moved. It will be compiler error.
     // println!("{}", length(xs)); // NG!
 }
