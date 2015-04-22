@@ -1,1 +1,3 @@
-/bin/*
+/bin
+cabal.sandbox.config
+/.cabal-sandbox

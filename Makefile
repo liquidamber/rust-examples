@@ -8,7 +8,7 @@ CILK_CXX ?= g++-4.9
 CILK_FLAGS ?= -fcilkplus
 CILK_LIBS ?= -lcilkrts
 
-GHC ?= ghc
+GHC ?= cabal exec -- ghc
 GHCFLAGS ?= -O3 -Wall
 
 GO ?= go
@@ -30,11 +30,12 @@ EXES_HS := $(SRCS_HS:%.hs=bin/%_hs)
 
 EXES :=
 
-ENABLE_RUST ?= 1
-ENABLE_CC ?= 1
-ENABLE_CILK ?= 1
-ENABLE_GO ?= 1
-ENABLE_HS ?= 1
+DEFAULT_ENABLE ?= 1
+ENABLE_RUST ?= $(DEFAULT_ENABLE)
+ENABLE_CC ?= $(DEFAULT_ENABLE)
+ENABLE_CILK ?= $(DEFAULT_ENABLE)
+ENABLE_GO ?= $(DEFAULT_ENABLE)
+ENABLE_HS ?= $(DEFAULT_ENABLE)
 
 ifeq ($(ENABLE_RUST),1)
 EXES += $(EXES_RS)
