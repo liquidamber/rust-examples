@@ -10,7 +10,7 @@ int fibonacci(int n) {
     return n;
   }
   int n1 = cilk_spawn fibonacci(n - 1);
-  int n2 = fibonacci(n - 2);
+  int n2 = cilk_spawn fibonacci(n - 2);
   cilk_sync;
   return n1 + n2;
 }
