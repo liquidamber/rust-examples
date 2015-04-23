@@ -1,3 +1,9 @@
+# generated binaries
 /bin
+/target
+# cabal sandbox config
 cabal.sandbox.config
 /.cabal-sandbox
+# rust package file (generated files)
+/Cargo.toml
+/Cargo.lock
