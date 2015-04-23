@@ -1,5 +1,5 @@
-RUSTC ?= rustc
-RUSTFLAGS ?= -g --opt-level=3
+CARGO ?= cargo
+CARGO_BUILDFLAGS ?= --release
 
 CXXFLAGS ?= -std=c++11 -g -O3
 LIBS ?= -lpthread
@@ -57,15 +57,21 @@ ifeq ($(ENABLE_HS),1)
 EXES += $(EXES_HS)
 endif
 
-.PHONY: all clean
+.PHONY: all clean rust-build
 
 all: $(EXES)
 
 clean:
 	$(RM) -r $(EXES:%=%*)
 
-bin/%_rs: %.rs
-	$(RUSTC) $(RUSTFLAGS) -o $@ $<
+Cargo.toml: $(SRCS_RS) generateCargoPackage.sh
+	sh ./generateCargoPackage.sh $(SRCS_RS) > $@
+
+rust-build: Cargo.toml
+	$(CARGO) build $(CARGO_BUILDFLAGS)
+
+bin/%_rs: rust-build %.rs
+	:
 
 bin/%_cc: %.cc
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS) $(LIBS)
