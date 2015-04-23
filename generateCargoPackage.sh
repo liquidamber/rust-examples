@@ -13,3 +13,8 @@ name = "`basename $i .rs`"
 path = "$i"
 EOS
 done
+
+cat <<EOS
+[dependencies]
+time = "*"
+EOS
