@@ -2,26 +2,17 @@
 // This file is distributed under MIT license.
 // See LICENSE file.
 
-extern crate green;
-extern crate rustuv;
-
-fn fibonacci(n: int) -> int {
+fn fibonacci(n: i32) -> i32 {
+    let n_ = n;
     if n < 2 {
         n
     } else {
-        let mut n1 = std::sync::Future::spawn(
-            proc () fibonacci(n - 1));
-        let mut n2 = std::sync::Future::spawn(
-            proc () fibonacci(n - 2));
-        n1.get() + n2.get()
+        let n1 = std::thread::spawn(
+            move || { fibonacci(n - 1) } );
+        let n2 = std::thread::spawn(
+            move || { fibonacci(n_ - 2) } );
+        n1.join().unwrap() + n2.join().unwrap()
     }
-}
-
-#[start]
-fn start(argc: int, argv: *const *const u8) -> int {
-    // I don't know the reason, however, green::basic::event_loop cause error.
-    // task '<main>' failed at 'called `Result::unwrap()` on an `Err` value: invalid argument', /home/rustbuild/src/rust-buildbot/slave/nightly-linux/build/src/libcore/result.rs:545
-    green::start(argc, argv, rustuv::event_loop, main)
 }
 
 fn main() {

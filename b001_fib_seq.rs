@@ -4,7 +4,7 @@
 
 extern crate time;
 
-fn fibonacci(n: int) -> int {
+fn fibonacci(n: i32) -> i32 {
     if n < 2 {
         n
     } else {

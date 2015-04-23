@@ -2,7 +2,7 @@
 // This file is distributed under MIT license.
 // See LICENSE file.
 
-fn to_fizz_buzz(i: int) -> (int, &'static str) {
+fn to_fizz_buzz(i: i32) -> (i32, &'static str) {
     let message = match i {
         _ if i % 15 == 0 => "FizzBuzz",
         _ if i % 3 == 0 => "Fizz",
@@ -12,13 +12,16 @@ fn to_fizz_buzz(i: int) -> (int, &'static str) {
     (i, message)
 }
 
-fn print_elem((i, x): (int, &str)) {
-    let istr = i.to_string();
-    std::io::stdio::println(if x == "" { istr.as_slice() } else { x });
+fn print_elem((i, x): (i32, &str)) {
+    if x == "" {
+        println!("{}", i.to_string());
+    }else{
+        println!("{}", x);
+    }
 }
 
-fn fizz_buzz(n: int, m: int) {
-    range(n, m).map(to_fizz_buzz).map(print_elem).count();
+fn fizz_buzz(n: i32, m: i32) {
+    (n..m).map(to_fizz_buzz).map(print_elem).count();
 }
 
 fn main() {
